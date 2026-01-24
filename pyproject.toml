@@ -1,0 +1,10 @@
+[project]
+name = "todo"
+version = "1.0.0"
+description = "Fastapi based API of Todo application"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]>=0.128.0",
+    "sqlmodel>=0.0.31",
+    "uvicorn>=0.40.0",
+]
