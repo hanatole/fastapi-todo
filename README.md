@@ -14,6 +14,18 @@ uv run uvicorn api:app --host 0.0.0.0 --port {PORT}
 
 ## Endpoints
 
+### Swagger UI - Docs
+
+```markdown
+http://localhost:{PORT}/api/v1/docs
+```
+
+### Swagger UI - Redoc
+
+```markdown
+http://localhost:{PORT}/api/v1/redoc
+```
+
 ### Health Check
 
 ```markdown
