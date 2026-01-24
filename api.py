@@ -1,10 +1,12 @@
 from contextlib import asynccontextmanager
 from typing import Annotated
 
-from fastapi import Depends, FastAPI, Path, HTTPException
+from fastapi import Depends, FastAPI, Path, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.routing import APIRouter
 from pydantic import Field, BaseModel
 from sqlmodel import Session, select
+from starlette.responses import JSONResponse
 
 from models import Todo
 from serializers import TodoResponse, TodoCreateRequest, TodoUpdateRequest
@@ -26,6 +28,12 @@ app = FastAPI(
     docs_url="/api/v1/docs",
 )
 router = APIRouter(prefix="/api/v1")
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    detail = f"{exc.errors()[0]['loc'][1]}: {exc.errors()[0]['msg']}"
+    return JSONResponse(status_code=400, content={"detail": detail})
 
 
 class FilterParams(BaseModel):

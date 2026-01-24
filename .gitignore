@@ -1,2 +1,6 @@
 api.http
-*.sqlite3
+db.sqlite3
+.venv
+htmlcov
+reports
+.coverage

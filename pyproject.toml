@@ -8,3 +8,14 @@ dependencies = [
     "sqlmodel>=0.0.31",
     "uvicorn>=0.40.0",
 ]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.14.14",
+]
+
+[tool.pytest.ini_options]
+addopts = "--junitxml=reports/junit.xml  --cov=api --cov-report html"
