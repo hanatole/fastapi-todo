@@ -2,10 +2,12 @@ name: Continuous Integration
 on:
   push:
     branches: [ deploy ]
+  workflow_dispatch:
 
 jobs:
   Validation:
     runs-on: ubuntu-24.04
+    if: false
 
     steps:
       - name: Checkout repository
@@ -58,3 +60,17 @@ jobs:
           tags: |
             ${{ vars.REGISTRY_USER }}/${{ vars.PROJECT }}:latest
             ${{ steps.meta.outputs.tag }}
+
+  Deployment:
+    #    needs: Packaging
+    uses: hanatole/deployer/.github/workflows/cd.yml@main
+    with:
+      project_directory: "/srv/todo"
+      traefik_rule: "Host(`api.ah.imc.chillo.fr`)"
+      network_name: traefiknetwork
+      service_name: blog
+      service_port: 8000
+      #    docker_image: ${{ needs.Packaging.outputs.tag }}
+      docker_image: "image345"
+      tier: "backend"
+    secrets: inherit
