@@ -4,7 +4,7 @@ on:
     branches: [ deploy ]
 
 jobs:
-  Validation:
+  validation:
     runs-on: ubuntu-24.04
 
     steps:
@@ -24,11 +24,11 @@ jobs:
           uv run ruff check .
           uv run pytest
 
-  Packaging:
-    needs: Validation
+  packaging:
+    needs: validation
     runs-on: ubuntu-24.04
     outputs:
-      tag: ${{ steps.meta.outputs.tag }}
+      taged_image: ${{ steps.meta.outputs.taged_image }}
 
     steps:
       - name: Checkout repository
@@ -36,11 +36,11 @@ jobs:
         with:
           ref: deploy
 
-      - name: Compute image tag
+      - name: Compute taged image name
         id: meta
         run: |
           SHA="${{ github.sha }}"
-          echo "tag=${SHA::7}" >> $GITHUB_OUTPUT
+          echo "taged_image=${{ vars.REGISTRY}}/${{ vars.PROJECT }}:${SHA::7}" >> $GITHUB_OUTPUT
 
       - name: Login to registry
         uses: docker/login-action@v3
@@ -56,10 +56,10 @@ jobs:
           push: true
           tags: |
             ${{ vars.REGISTRY}}/${{ vars.PROJECT }}:latest
-            ${{ vars.REGISTRY}}/${{ vars.PROJECT }}:${{ steps.meta.outputs.tag }}
+            ${{ steps.meta.outputs.taged_image }}
 
-  Deployment:
-    needs: Packaging
+  deployment:
+    needs: packaging
     uses: hanatole/deployer/.github/workflows/cd.yml@main
     with:
       project_directory: "/srv/todo"
@@ -67,7 +67,7 @@ jobs:
       network_name: traefiknetwork
       service_name: "todo-backend"
       service_port: 8000
-      docker_image: ${{ vars.REGISTRY}}/${{ vars.PROJECT }}
-      docker_image_tag: ${{ needs.Packaging.outputs.tag }}
+      docker_image: ${{ needs.packaging.outputs.taged_image }}
+      healthcheck_url: ${{ vars.HEALTHCHECK_URL }}
       tier: "backend"
     secrets: inherit

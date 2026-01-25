@@ -1,4 +1,4 @@
-api.http
+local/api.http
 *.sqlite*
 .venv
 htmlcov
