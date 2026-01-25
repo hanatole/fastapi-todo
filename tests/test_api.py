@@ -23,6 +23,7 @@ def test_create_todo_with_valide_data_should_succeed(mock_db_session):
     payload = {"title": "Test task"}
     response = client.post(f"{BASE_URL}/todos", json=payload)
     assert response.status_code == 201
+    assert response.headers["location"] == f"{BASE_URL}/todos/1"
     data = response.json()
     assert data["id"] == 1
     assert data["title"] == payload["title"]
@@ -34,6 +35,7 @@ def test_create_todo_with_valide_data_should_succeed(mock_db_session):
 @pytest.mark.parametrize(
     "payload,message",
     [
+        (None, "body: Body required"),
         ({"titles": "Learn coding"}, "title: Field required"),
         ({"title": "RX"}, "title: String should have at least 3 characters"),
     ],
@@ -74,7 +76,7 @@ def test_delete_non_existing_todo_should_fail(mock_db_session):
     assert response.json()["detail"] == "Task not found"
 
 
-def test_update_todo_with_valid_data_should_succeed(mock_db_session):
+def test_update_existing_todo_with_valid_data_should_succeed(mock_db_session):
     mock_db_session.get.return_value = Todo(id=1, title="Test task", status="new")
     payload = {"title": "Learn coding", "status": "doing"}
     response = client.put(f"{BASE_URL}/todos/1", json=payload)
@@ -96,6 +98,7 @@ def test_update_non_existing_todo_should_fail(mock_db_session):
 @pytest.mark.parametrize(
     "payload,message",
     [
+        (None, "body: Body required"),
         ({"title": "Learn coding"}, "status: Field required"),
         (
             {"title": "Learn coding", "status": "close"},
@@ -103,7 +106,7 @@ def test_update_non_existing_todo_should_fail(mock_db_session):
         ),
     ],
 )
-def test_update_doto_with_invalid_data_should_fail(payload, message):
+def test_update_existing_doto_with_invalid_data_should_fail(payload, message):
     response = client.put(f"{BASE_URL}/todos/1", json=payload)
     assert response.status_code == 400
     assert response.json()["detail"] == message

@@ -11,9 +11,9 @@ def override_get_session():
     yield session_mock
 
 
-app.dependency_overrides[get_session] = override_get_session
-
-
 @pytest.fixture
 def mock_db_session():
     yield session_mock
+
+
+app.dependency_overrides[get_session] = override_get_session

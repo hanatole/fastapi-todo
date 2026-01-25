@@ -56,6 +56,8 @@ curl -X GET http://localhost:{PORT}/api/v1/todos/{pk}
 curl -X POST http://localhost:{PORT}/api/v1/todos -d '{"title": "Learn FastAPI"}'
 ```
 
+The response header `Location` will contain the URL of the newly created task.
+
 ### Complete a todo
 
 ```markdown
@@ -65,7 +67,8 @@ curl -X POST http://localhost:{PORT}/api/v1/todos/{pk}
 ### Update a todo
 
 ```markdown
-curl -X PUT http://localhost:{PORT}/api/v1/todos/{pk} -d '{"title": "Learn FastAPI", "status": "doing"}'
+curl -X PUT http://localhost:{PORT}/api/v1/todos/{pk} \
+-d '{"title": "Learn FastAPI", "status": "doing"}'
 ```
 
 ### Delete a todo
