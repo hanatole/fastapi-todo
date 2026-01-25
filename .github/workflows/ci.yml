@@ -68,7 +68,7 @@ jobs:
       project_directory: "/srv/todo"
       traefik_rule: "Host(`api.ah.imc.chillo.fr`)"
       network_name: traefiknetwork
-      service_name: blog
+      service_name: "todo-backend"
       service_port: 8000
       #    docker_image: ${{ needs.Packaging.outputs.tag }}
       docker_image: "image345"
