@@ -68,7 +68,7 @@ jobs:
       network_name: traefiknetwork
       service_name: "todo-backend"
       service_port: 8000
-      fqn_docker_image: ${{ vars.REGISTRY}}/${{ vars.PROJECT }}
+      docker_image: ${{ vars.REGISTRY}}/${{ vars.PROJECT }}
       docker_image_tag: ${{ needs.Packaging.outputs.tag }}
       tier: "backend"
     secrets: inherit
