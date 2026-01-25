@@ -73,5 +73,5 @@ jobs:
       #    docker_image: ${{ needs.Packaging.outputs.tag }}
       docker_image: "blog"
       docker_image_tag: "05c7a27"
-      tier: "backend"
+      tier: "backendx"
     secrets: inherit
