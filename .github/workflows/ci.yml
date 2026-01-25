@@ -3,11 +3,12 @@ on:
   push:
     branches: [ deploy ]
   workflow_dispatch:
+env:
+  IMAGE: ${{ vars.REGISTRY}}/${{ vars.PROJECT }}
 
 jobs:
   Validation:
     runs-on: ubuntu-24.04
-    if: false
 
     steps:
       - name: Checkout repository
@@ -42,8 +43,7 @@ jobs:
         id: meta
         run: |
           SHA="${{ github.sha }}"
-          test -n "$SHA"
-          echo "tag=${{ vars.REGISTRY_USER }}/${{ vars.PROJECT }}:${SHA::7}" >> $GITHUB_OUTPUT
+          echo "tag=${SHA::7}" >> $GITHUB_OUTPUT
 
       - name: Login to registry
         uses: docker/login-action@v3
@@ -58,11 +58,11 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ vars.REGISTRY_USER }}/${{ vars.PROJECT }}:latest
-            ${{ steps.meta.outputs.tag }}
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:${{ steps.meta.outputs.tag }}
 
   Deployment:
-    #    needs: Packaging
+    needs: Packaging
     uses: hanatole/deployer/.github/workflows/cd.yml@main
     with:
       project_directory: "/srv/todo"
@@ -70,8 +70,7 @@ jobs:
       network_name: traefiknetwork
       service_name: "todo-backend"
       service_port: 8000
-      #    docker_image: ${{ needs.Packaging.outputs.tag }}
-      docker_image: "repository.ah.imc.chillo.fr/docker-hosted/blog"
-      docker_image_tag: "05c7a27"
-      tier: "backendx"
+      fqn_docker_image: ${{env.IMAGE}}
+      docker_image_tag: ${{ needs.Packaging.outputs.tag }}
+      tier: "backend"
     secrets: inherit
