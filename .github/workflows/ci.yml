@@ -71,7 +71,7 @@ jobs:
       service_name: "todo-backend"
       service_port: 8000
       #    docker_image: ${{ needs.Packaging.outputs.tag }}
-      docker_image: "ahagbes/fastapi-todo"
-      docker_image_tag: "latest"
+      docker_image: "blog"
+      docker_image_tag: "05c7a27"
       tier: "backend"
     secrets: inherit
