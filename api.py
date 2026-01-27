@@ -53,10 +53,10 @@ async def healthcheck():
 
 @router.post("/todos", response_model=TodoResponse, status_code=201)
 async def create_todo(
-        request: Request,
-        response: Response,
-        item: TodoCreateRequest,
-        session: Session = Depends(get_session),
+    request: Request,
+    response: Response,
+    item: TodoCreateRequest,
+    session: Session = Depends(get_session),
 ):
     logger.info(f"Creating new task: {item.title}")
     todo = Todo(**item.model_dump(), status="new")
@@ -72,15 +72,15 @@ async def create_todo(
 
 @router.put("/todos/{pk}", response_model=TodoResponse)
 async def update_todo(
-        pk: Annotated[int, Path(title="ID of the task")],
-        item: TodoUpdateRequest,
-        session: Session = Depends(get_session),
+    pk: Annotated[int, Path(title="ID of the task")],
+    item: TodoUpdateRequest,
+    session: Session = Depends(get_session),
 ):
     logger.info(f"Updating task {pk}")
     task = session.get(Todo, pk)
     if not task:
         logger.error(f"Task {pk} not found")
-        raise HTTPException(status_code=404, detail="Task {pk} not found")
+        raise HTTPException(status_code=404, detail=f"Task {pk} not found")
     task.title = item.title
     task.status = item.status
     session.commit()
@@ -91,8 +91,8 @@ async def update_todo(
 
 @router.get("/todos/{pk}", response_model=TodoResponse, name="get_todo")
 async def get_todo(
-        pk: Annotated[int, Path(title="ID of the task")],
-        session: Session = Depends(get_session),
+    pk: Annotated[int, Path(title="ID of the task")],
+    session: Session = Depends(get_session),
 ):
     logger.info(f"Getting task {pk}")
     response = session.get(Todo, pk)
@@ -100,7 +100,7 @@ async def get_todo(
         logger.success(f"Task {pk} found successfully")
         return response
     logger.error(f"Task {pk} not found")
-    raise HTTPException(status_code=404, detail="Task {pk} not found")
+    raise HTTPException(status_code=404, detail=f"Task {pk} not found")
 
 
 @router.get("/todos", response_model=list[TodoResponse])
@@ -118,14 +118,14 @@ async def get_all(q: FilterParams = Depends(), session: Session = Depends(get_se
 
 @router.post("/todos/{pk}", response_model=TodoResponse)
 async def complete_todo(
-        pk: Annotated[int, Path(title="ID of the task")],
-        session: Session = Depends(get_session),
+    pk: Annotated[int, Path(title="ID of the task")],
+    session: Session = Depends(get_session),
 ):
     logger.info(f"Marking task {pk} as completed")
     task = session.get(Todo, pk)
     if not task:
         logger.error(f"Task {pk} not found")
-        raise HTTPException(status_code=404, detail="Task {pk} not found")
+        raise HTTPException(status_code=404, detail=f"Task {pk} not found")
     task.status = "completed"
     session.commit()
     session.refresh(task)
@@ -135,14 +135,14 @@ async def complete_todo(
 
 @router.delete("/todos/{pk}", response_model=None, status_code=204)
 async def delete_todo(
-        pk: Annotated[int, Path(title="ID of the task")],
-        session: Session = Depends(get_session),
+    pk: Annotated[int, Path(title="ID of the task")],
+    session: Session = Depends(get_session),
 ):
     logger.info(f"Deleting task {pk}")
     task = session.get(Todo, pk)
     if not task:
         logger.error(f"Task {pk} not found")
-        raise HTTPException(status_code=404, detail="Task {pk} not found")
+        raise HTTPException(status_code=404, detail=f"Task {pk} not found")
     session.delete(task)
     session.commit()
     logger.success(f"Task {pk} deleted successfully")

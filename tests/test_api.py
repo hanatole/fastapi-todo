@@ -58,7 +58,7 @@ def test_get_non_existing_todo_should_fail(mock_db_session):
     mock_db_session.get.return_value = None
     response = client.get(f"{BASE_URL}/todos/1")
     assert response.status_code == 404
-    assert response.json()["detail"] == "Task not found"
+    assert response.json()["detail"] == "Task 1 not found"
 
 
 def test_delete_existing_todo_should_succeed(mock_db_session):
@@ -73,7 +73,7 @@ def test_delete_non_existing_todo_should_fail(mock_db_session):
     mock_db_session.get.return_value = None
     response = client.delete(f"{BASE_URL}/todos/1")
     assert response.status_code == 404
-    assert response.json()["detail"] == "Task not found"
+    assert response.json()["detail"] == "Task 1 not found"
 
 
 def test_update_existing_todo_with_valid_data_should_succeed(mock_db_session):
@@ -92,7 +92,7 @@ def test_update_non_existing_todo_should_fail(mock_db_session):
     payload = {"title": "Learn coding", "status": "doing"}
     response = client.put(f"{BASE_URL}/todos/1", json=payload)
     assert response.status_code == 404
-    assert response.json()["detail"] == "Task not found"
+    assert response.json()["detail"] == "Task 1 not found"
 
 
 @pytest.mark.parametrize(
@@ -144,4 +144,4 @@ def test_complete_non_existing_todo_should_fail(mock_db_session):
     mock_db_session.get.return_value = None
     response = client.post(f"{BASE_URL}/todos/1")
     assert response.status_code == 404
-    assert response.json()["detail"] == "Task not found"
+    assert response.json()["detail"] == "Task 1 not found"
