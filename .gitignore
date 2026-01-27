@@ -1,7 +1,8 @@
-api.http
+local/api.http
 *.sqlite*
 .venv
 htmlcov
 reports
 .coverage
 .env
+coverage.xml

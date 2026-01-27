@@ -1,0 +1,54 @@
+name: Continuous Deployment
+on:
+  workflow_run:
+    workflows: [ "Continuous Integration" ]
+    types: [ completed ]
+    branches: [ main ]
+
+jobs:
+  packaging:
+    runs-on: ubuntu-24.04
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    outputs:
+      tagged_image: ${{ steps.meta.outputs.tagged_image }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6.0.2
+
+      - name: Compute tagged image name
+        id: meta
+        run: |
+          SHA="${{ github.event.workflow_run.head_sha }}"
+          echo "tagged_image=${{ vars.REGISTRY}}/${{ vars.PROJECT }}:${SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Login to registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.REGISTRY }}
+          username: ${{ vars.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ vars.REGISTRY}}/${{ vars.PROJECT }}:latest
+            ${{ steps.meta.outputs.tagged_image }}
+
+  deployment:
+    needs: packaging
+    uses: hanatole/deployer/.github/workflows/cd.yml@main
+    with:
+      project_directory: "/srv/todo"
+      traefik_rule: "Host(`api.ah.imc.chillo.fr`)"
+      network_name: traefiknetwork
+      service_name: "todo-backend"
+      service_port: 8000
+      docker_image: ${{ needs.packaging.outputs.tagged_image }}
+      healthcheck_url: ${{ vars.HEALTHCHECK_URL }}
+      tier: "backend"
+    secrets: inherit

@@ -21,4 +21,4 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "--junitxml=reports/junit.xml  --cov=api --cov-report html"
+addopts = "--junitxml=reports/junit.xml  --cov=api --cov-report html --cov-report xml"
