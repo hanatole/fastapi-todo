@@ -1,13 +1,12 @@
-FROM python:3.12-slim AS builder
+FROM ghcr.io/astral-sh/uv:python3.12-alpine AS builder
 WORKDIR /app
-COPY --from=ghcr.io/astral-sh/uv:0.9.22 /uv /bin/
 
 COPY pyproject.toml uv.lock ./
 
 RUN python -m venv .venv \
     && uv sync --no-group dev
 
-FROM python:3.12-slim
+FROM python:3.12-alpine3.23
 WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
