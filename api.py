@@ -80,7 +80,7 @@ async def update_todo(
     task = session.get(Todo, pk)
     if not task:
         logger.error(f"Task {pk} not found")
-        raise HTTPException(status_code=404, detail="Task not found")
+        raise HTTPException(status_code=404, detail="Task {pk} not found")
     task.title = item.title
     task.status = item.status
     session.commit()
@@ -100,7 +100,7 @@ async def get_todo(
         logger.success(f"Task {pk} found successfully")
         return response
     logger.error(f"Task {pk} not found")
-    raise HTTPException(status_code=404, detail="Task not found")
+    raise HTTPException(status_code=404, detail="Task {pk} not found")
 
 
 @router.get("/todos", response_model=list[TodoResponse])
@@ -125,7 +125,7 @@ async def complete_todo(
     task = session.get(Todo, pk)
     if not task:
         logger.error(f"Task {pk} not found")
-        raise HTTPException(status_code=404, detail="Task not found")
+        raise HTTPException(status_code=404, detail="Task {pk} not found")
     task.status = "completed"
     session.commit()
     session.refresh(task)
@@ -142,7 +142,7 @@ async def delete_todo(
     task = session.get(Todo, pk)
     if not task:
         logger.error(f"Task {pk} not found")
-        raise HTTPException(status_code=404, detail="Task not found")
+        raise HTTPException(status_code=404, detail="Task {pk} not found")
     session.delete(task)
     session.commit()
     logger.success(f"Task {pk} deleted successfully")

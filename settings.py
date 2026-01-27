@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     @property
-    def log_level(self):
+    def level(self):
         return self.LOG_LEVEL or ("DEBUG" if self.DEBUG else "WARNING")
 
 
@@ -23,7 +23,7 @@ settings = Settings()
 logger.remove()
 logger.add(
     sys.stderr,
-    level=settings.log_level,
+    level=settings.level,
     colorize=True,
     backtrace=True,
     diagnose=False,
