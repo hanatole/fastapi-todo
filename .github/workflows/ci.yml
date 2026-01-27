@@ -1,7 +1,5 @@
 name: Continuous Integration
-on:
-  push:
-    branches: [ deploy ]
+on: push
 
 jobs:
   validation:
@@ -10,8 +8,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6.0.2
-        with:
-          ref: deploy
 
       - name: Setup environment
         uses: astral-sh/setup-uv@v7.2.0
@@ -24,50 +20,13 @@ jobs:
           uv run ruff check .
           uv run pytest
 
-  packaging:
-    needs: validation
-    runs-on: ubuntu-24.04
-    outputs:
-      taged_image: ${{ steps.meta.outputs.taged_image }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6.0.2
+      - name: Sonarqube scan
+        uses: SonarSource/sonarqube-scan-action@v7.0.0
         with:
-          ref: deploy
-
-      - name: Compute taged image name
-        id: meta
-        run: |
-          SHA="${{ github.sha }}"
-          echo "taged_image=${{ vars.REGISTRY}}/${{ vars.PROJECT }}:${SHA::7}" >> $GITHUB_OUTPUT
-
-      - name: Login to registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ vars.REGISTRY }}
-          username: ${{ vars.REGISTRY_USER }}
-          password: ${{ secrets.REGISTRY_TOKEN }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          tags: |
-            ${{ vars.REGISTRY}}/${{ vars.PROJECT }}:latest
-            ${{ steps.meta.outputs.taged_image }}
-
-  deployment:
-    needs: packaging
-    uses: hanatole/deployer/.github/workflows/cd.yml@main
-    with:
-      project_directory: "/srv/todo"
-      traefik_rule: "Host(`api.ah.imc.chillo.fr`)"
-      network_name: traefiknetwork
-      service_name: "todo-backend"
-      service_port: 8000
-      docker_image: ${{ needs.packaging.outputs.taged_image }}
-      healthcheck_url: ${{ vars.HEALTHCHECK_URL }}
-      tier: "backend"
-    secrets: inherit
+          ProjectBaseDir: .
+          args: >
+            -Dsonar.organization=hanatole-github
+            -Dsonar.projectKey=fastapi-todo
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
