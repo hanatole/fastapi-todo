@@ -31,7 +31,7 @@ router = APIRouter(prefix="/api/v1")
 
 
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
+async def validation_exception_handler(_: Request, exc: RequestValidationError):
     if exc.errors()[0]["input"] is None:
         detail = "body: Body required"
     else:
@@ -48,15 +48,15 @@ class FilterParams(BaseModel):
 
 @router.get("/healthcheck", response_model=dict)
 async def healthcheck():
-    return {"status": "ok"}
+    return {"status": "healthy"}
 
 
 @router.post("/todos", response_model=TodoResponse, status_code=201)
 async def create_todo(
-    request: Request,
-    response: Response,
-    item: TodoCreateRequest,
-    session: Session = Depends(get_session),
+        request: Request,
+        response: Response,
+        item: TodoCreateRequest,
+        session: Session = Depends(get_session),
 ):
     logger.info(f"Creating new task: {item.title}")
     todo = Todo(**item.model_dump(), status="new")
@@ -72,9 +72,9 @@ async def create_todo(
 
 @router.put("/todos/{pk}", response_model=TodoResponse)
 async def update_todo(
-    pk: Annotated[int, Path(title="ID of the task")],
-    item: TodoUpdateRequest,
-    session: Session = Depends(get_session),
+        pk: Annotated[int, Path(title="ID of the task")],
+        item: TodoUpdateRequest,
+        session: Session = Depends(get_session),
 ):
     logger.info(f"Updating task {pk}")
     task = session.get(Todo, pk)
@@ -91,8 +91,8 @@ async def update_todo(
 
 @router.get("/todos/{pk}", response_model=TodoResponse, name="get_todo")
 async def get_todo(
-    pk: Annotated[int, Path(title="ID of the task")],
-    session: Session = Depends(get_session),
+        pk: Annotated[int, Path(title="ID of the task")],
+        session: Session = Depends(get_session),
 ):
     logger.info(f"Getting task {pk}")
     response = session.get(Todo, pk)
@@ -118,8 +118,8 @@ async def get_all(q: FilterParams = Depends(), session: Session = Depends(get_se
 
 @router.post("/todos/{pk}", response_model=TodoResponse)
 async def complete_todo(
-    pk: Annotated[int, Path(title="ID of the task")],
-    session: Session = Depends(get_session),
+        pk: Annotated[int, Path(title="ID of the task")],
+        session: Session = Depends(get_session),
 ):
     logger.info(f"Marking task {pk} as completed")
     task = session.get(Todo, pk)
@@ -135,8 +135,8 @@ async def complete_todo(
 
 @router.delete("/todos/{pk}", response_model=None, status_code=204)
 async def delete_todo(
-    pk: Annotated[int, Path(title="ID of the task")],
-    session: Session = Depends(get_session),
+        pk: Annotated[int, Path(title="ID of the task")],
+        session: Session = Depends(get_session),
 ):
     logger.info(f"Deleting task {pk}")
     task = session.get(Todo, pk)
