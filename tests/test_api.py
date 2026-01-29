@@ -12,7 +12,7 @@ client = TestClient(app)
 def test_should_return_ok():
     response = client.get(f"{BASE_URL}/healthcheck")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok"}
+    assert response.json() == {"status": "healthy"}
 
 
 def test_create_todo_with_valide_data_should_succeed(mock_db_session):
