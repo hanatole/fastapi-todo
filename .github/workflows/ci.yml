@@ -8,6 +8,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
 
       - name: Setup environment
         uses: astral-sh/setup-uv@v7.2.0
@@ -31,6 +33,7 @@ jobs:
             -Dsonar.tests=tests/
             -Dsonar.python.xunit.reportPath=reports/junit.xml
             -Dsonar.verbose=true
+            -Dsonar.python.version=3.12
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
